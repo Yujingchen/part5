@@ -58,3 +58,9 @@ ul {
   color: green;
   border: solid 3px green
 }
+
+.blog{
+  border:solid black 1px;
+  margin: 5px;
+  padding: 2px;
+}

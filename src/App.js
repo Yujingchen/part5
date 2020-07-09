@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import './App.css'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [title, setTitle] = useState("")
@@ -13,6 +17,7 @@ const App = () => {
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState('')
   const [notification, setNotification] = useState('')
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -24,9 +29,10 @@ const App = () => {
       setBlogs(blogs)
     )
   }, [])
-
-  const handleSaveSubmit = async (e) => {
-    e.preventDefault()
+  const blogFormRef = useRef(null)
+  const handleSaveSubmit = async (event) => {
+    event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     const newBlog = {
       title: title,
       author: author,
@@ -35,7 +41,6 @@ const App = () => {
     try {
       const savedBlog = await blogService.postNewBlog(newBlog)
       const newBlogs = blogs.concat(savedBlog)
-      console.log(newBlogs)
       setBlogs(newBlogs)
       setTitle("")
       setAuthor("")
@@ -77,73 +82,60 @@ const App = () => {
       }, 5000)
     }
   }
-  const handleTextChange = (e) => {
-    switch (e.target.name) {
+  const handleTextChange = (event) => {
+    switch (event.target.name) {
       case "title":
-        setTitle(e.target.value)
+        setTitle(event.target.value)
         break
       case "url":
-        setUrl(e.target.value)
+        setUrl(event.target.value)
         break
       case "author":
-        setAuthor(e.target.value)
+        setAuthor(event.target.value)
         break
       case "username":
-        setUsername(e.target.value)
+        setUsername(event.target.value)
         break
       case "password":
-        setPassword(e.target.value)
+        setPassword(event.target.value)
         break
       default:
         break
     }
   }
 
-  const loginForm = () => {
-    return (
-      <form onSubmit={(e) => handleLoginSubmit(e)}>
-        <ul>
-          <li>
-            <label htmlFor="username">username: </label>
-            <input value={username} name="username" onChange={(e) => handleTextChange(e)}></input>
-          </li>
-          <li>
-            <label htmlFor="password">password: </label>
-            <input value={password} name="password" onChange={(e) => handleTextChange(e)}></input>
-          </li>
-          <li>
-            <button type="submit" >login</button>
-          </li>
-        </ul>
-        <ul>
-        </ul>
-      </form>
-    )
+  const handleLogoutSubmit = (event) => {
+    event.preventDefault()
+    setUser(null)
+    window.localStorage.removeItem('loggedBlogappUser')
   }
 
-  const blogForm = () => {
-    return (
-      <form onSubmit={(e) => handleSaveSubmit(e)}>
-        <ul style={{ listStyleType: "none" }}>
-          <li>
-            <label htmlFor="title">title: </label>
-            <input value={title} name="title" onChange={(e) => handleTextChange(e)}></input>
-          </li>
-          <li>
-            <label htmlFor="author">author: </label>
-            <input value={author} name="author" onChange={(e) => handleTextChange(e)}></input>
-          </li>
-          <li>
-            <label htmlFor="url">url: </label>
-            <input value={url} name="url" onChange={(e) => handleTextChange(e)}></input>
-          </li>
-          <li>
-            <button type="submit">create</button>
-          </li>
-        </ul>
-      </form >
-    )
+  const handleLikesIncrease = async (event, id) => {
+    console.log(id)
+    event.preventDefault()
+    try {
+      const elementsIndex = blogs.findIndex(blog => blog.id === id)
+      const blogToUpdate = blogs[elementsIndex]
+      const newBlog = { ...blogToUpdate, likes: blogs[elementsIndex].likes + 1 }
+      const updatedBlog = await blogService.updateBlog(newBlog)
+      setBlogs(updatedBlog)
+      setTitle("")
+      setAuthor("")
+      setUrl("")
+      setNotification(`a new blog ${title} by ${author} added`)
+      setTimeout(() => {
+        setNotification('')
+      }, 5000)
+    }
+    catch (error) {
+      console.log(error)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 5000)
+      setErrorMessage('something went wrong when saving the new blog, please enter again')
+    }
   }
+
   return (
     <div>
       {errorMessage && <div className='errorMessage'>
@@ -152,20 +144,32 @@ const App = () => {
       {notification && <div className='notification'>
         {notification}
       </div>}
-      {user === null && loginForm()}
+      {user === null &&
+        <>
+          <h2>Login</h2>
+          <Togglable buttonLabel='login'>
+            <LoginForm handleSubmit={handleLoginSubmit} handleUsernameChange={handleTextChange}
+              handlePasswordChange={handleTextChange} username={username} password={password} />
+          </Togglable>
+        </>
+      }
       {user !== null &&
         <div>
           <h1>blogs</h1>
-          <p>{user.username} logged in</p>
+          <p>{user.username} logged in <span><button onClick={(e) => handleLogoutSubmit(e)}>logout</button></span></p>
           <h1>create new</h1>
-          {blogForm()}
+          {
+            <Togglable buttonLabel='new blog' ref={blogFormRef}>
+              <BlogForm handleTitleChange={handleTextChange} handleUrlChange={handleTextChange} handleAuthorChange={handleTextChange}
+                handleSubmit={handleSaveSubmit}></BlogForm>
+            </Togglable>
+          }
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} handleLikes={handleLikesIncrease} />
           )}
         </div>
       }
     </div >
   )
 }
-
 export default App
