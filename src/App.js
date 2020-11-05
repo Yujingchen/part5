@@ -21,10 +21,19 @@ const App = () => {
       setUser(user)
       blogService.setToken(user.token)
     }
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      sortBlogsByLikeCount(blogs)
       setBlogs(blogs)
+      console.log(blogs)
+    }
     )
   }, [])
+
+  const sortBlogsByLikeCount = (blogs) => {
+    blogs.sort(function (a, b) {
+      return b.likes - a.likes
+    })
+  }
 
   const blogFormRef = useRef(null)
 
@@ -86,8 +95,8 @@ const App = () => {
         url: blogToUpdate.url
       }
       const newBlogs = [...blogs]
-      await blogService.updateBlog(newBlog)
-      newBlogs[elementsIndex] = newBlog
+      const updatedBlog = await blogService.updateBlog(newBlog)
+      newBlogs[elementsIndex] = updatedBlog
       setBlogs(newBlogs)
     }
     catch (error) {
