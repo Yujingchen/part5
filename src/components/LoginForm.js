@@ -1,53 +1,57 @@
 import React, { useState } from 'react'
-
-
+import PropTypes from 'prop-types'
 
 
 const LoginForm = ({
-    loginUser,
+  loginUser,
 }) => {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-    const handleTextChange = (event) => {
-        switch (event.target.name) {
-            case "username":
-                setUsername(event.target.value)
-                break
-            case "password":
-                setPassword(event.target.value)
-                break
-            default:
-                break
-        }
+  const handleTextChange = (event) => {
+    switch (event.target.name) {
+    case 'username':
+      setUsername(event.target.value)
+      break
+    case 'password':
+      setPassword(event.target.value)
+      break
+    default:
+      break
     }
-    const login = (event) => {
-        event.preventDefault()
-        const loginData = {
-            username: username,
-            password: password,
-        }
-        loginUser(loginData)
-        setUsername('')
-        setPassword('')
+  }
+  const login = (event) => {
+    event.preventDefault()
+    const loginData = {
+      username: username,
+      password: password,
     }
+    loginUser(loginData)
+    setUsername('')
+    setPassword('')
+  }
 
-    return (
+  return (
+    <div>
+      <form onSubmit={login}>
         <div>
-            <form onSubmit={login}>
-                <div>
                     username
-                    <input value={username} name="username"
-                        onChange={(event) => handleTextChange(event)} />
-                </div>
-                <div>
-                    password
-                    <input value={password} name="password"
-                        onChange={(event) => handleTextChange(event)} />
-                </div>
-                <button type="submit">login</button>
-            </form>
+          <input value={username} name="username"
+            onChange={(event) => handleTextChange(event)} />
         </div>
-    )
+        <div>
+                    password
+          <input value={password} name="password"
+            onChange={(event) => handleTextChange(event)} />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </div>
+  )
 }
+
+LoginForm.propTypes = {
+  loginUser: PropTypes.func.isRequired
+}
+
 export default LoginForm

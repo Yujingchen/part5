@@ -63,7 +63,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(loginUser)
       )
-      window.localStorage.setItem("loggedIn", true)
+      window.localStorage.setItem('loggedIn', true)
       setUser(loginUser)
       blogService.setToken(loginUser.token)
       console.log(loginUser)

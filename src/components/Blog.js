@@ -4,7 +4,7 @@ const Blog = ({ blog, handleLikes, handleDelete }) => {
   const [visibility, setVisibility] = useState(false)
   const buttonLabel = visibility ? 'hide' : 'view'
   const toggleVisibility = () => { setVisibility(!visibility) }
-  const contentVisibility = visibility ? { display: "" } : { display: 'none' }
+  const contentVisibility = visibility ? { display: '' } : { display: 'none' }
   const blogContent =
     (
       <>
