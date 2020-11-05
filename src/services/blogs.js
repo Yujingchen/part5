@@ -5,7 +5,7 @@ const baseUrl = 'http://localhost:3003/api/blogs'
 let token = null
 
 const setToken = newToken => {
-  token = `bearer ${newToken}`
+  token = `Bearer ${newToken}`
 }
 
 const getAll = () => {
@@ -29,4 +29,13 @@ const updateBlog = (update) => {
   return axios.put(`${baseUrl}/${update.id}`, update, config).then(response =>
     response.data)
 }
-export default { getAll, postNewBlog, setToken, updateBlog }
+
+const deleteBlog = (blog) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  return axios.delete(`${baseUrl}/${blog.id}`, config).then(response =>
+    response.data)
+}
+
+export default { getAll, postNewBlog, setToken, updateBlog, deleteBlog }

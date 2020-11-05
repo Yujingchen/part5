@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, handleLikes }) => {
+const Blog = ({ blog, handleLikes, handleDelete }) => {
   const [visibility, setVisibility] = useState(false)
-  const buttonLabel = visibility ? 'hide' : 'show'
+  const buttonLabel = visibility ? 'hide' : 'view'
   const toggleVisibility = () => { setVisibility(!visibility) }
   const contentVisibility = visibility ? { display: "" } : { display: 'none' }
   const blogContent =
@@ -24,6 +24,9 @@ const Blog = ({ blog, handleLikes }) => {
         <button onClick={toggleVisibility}>
           {buttonLabel}
         </button>
+        <span>
+          <button onClick={(event) => handleDelete(event, blog.id)}>delete</button>
+        </span>
       </span>
       {blogContent}
     </div>

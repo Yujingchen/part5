@@ -5,16 +5,12 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+
 import './App.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [title, setTitle] = useState("")
-  const [url, setUrl] = useState("")
-  const [author, setAuthor] = useState("")
   const [user, setUser] = useState(null)
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState('')
   const [notification, setNotification] = useState('')
 
@@ -29,23 +25,17 @@ const App = () => {
       setBlogs(blogs)
     )
   }, [])
+
   const blogFormRef = useRef(null)
-  const handleSaveSubmit = async (event) => {
-    event.preventDefault()
+
+  const handleSaveSubmit = async (newBlog) => {
     blogFormRef.current.toggleVisibility()
-    const newBlog = {
-      title: title,
-      author: author,
-      url: url
-    }
     try {
       const savedBlog = await blogService.postNewBlog(newBlog)
       const newBlogs = blogs.concat(savedBlog)
       setBlogs(newBlogs)
-      setTitle("")
-      setAuthor("")
-      setUrl("")
-      setNotification(`a new blog ${title} by ${author} added`)
+
+      setNotification(`a new blog ${newBlog.title} by ${newBlog.author} added`)
       setTimeout(() => {
         setNotification('')
       }, 5000)
@@ -58,12 +48,7 @@ const App = () => {
     }
   }
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault()
-    const loginData = {
-      username: username,
-      password: password,
-    }
+  const handleLoginSubmit = async (loginData) => {
     try {
       const loginUser = await loginService.login(loginData)
       window.localStorage.setItem(
@@ -72,8 +57,7 @@ const App = () => {
       window.localStorage.setItem("loggedIn", true)
       setUser(loginUser)
       blogService.setToken(loginUser.token)
-      setUsername('')
-      setPassword('')
+      console.log(loginUser)
     }
     catch (error) {
       setErrorMessage('Wrong credentials')
@@ -82,28 +66,6 @@ const App = () => {
       }, 5000)
     }
   }
-  const handleTextChange = (event) => {
-    switch (event.target.name) {
-      case "title":
-        setTitle(event.target.value)
-        break
-      case "url":
-        setUrl(event.target.value)
-        break
-      case "author":
-        setAuthor(event.target.value)
-        break
-      case "username":
-        setUsername(event.target.value)
-        break
-      case "password":
-        setPassword(event.target.value)
-        break
-      default:
-        break
-    }
-  }
-
   const handleLogoutSubmit = (event) => {
     event.preventDefault()
     setUser(null)
@@ -111,28 +73,49 @@ const App = () => {
   }
 
   const handleLikesIncrease = async (event, id) => {
-    console.log(id)
     event.preventDefault()
     try {
       const elementsIndex = blogs.findIndex(blog => blog.id === id)
       const blogToUpdate = blogs[elementsIndex]
-      const newBlog = { ...blogToUpdate, likes: blogs[elementsIndex].likes + 1 }
-      const updatedBlog = await blogService.updateBlog(newBlog)
-      setBlogs(updatedBlog)
-      setTitle("")
-      setAuthor("")
-      setUrl("")
-      setNotification(`a new blog ${title} by ${author} added`)
-      setTimeout(() => {
-        setNotification('')
-      }, 5000)
+      const newBlog = {
+        id: blogToUpdate.id,
+        user: blogToUpdate.user.ID,
+        likes: blogToUpdate.likes + 1,
+        author: blogToUpdate.author,
+        title: blogToUpdate.title,
+        url: blogToUpdate.url
+      }
+      const newBlogs = [...blogs]
+      await blogService.updateBlog(newBlog)
+      newBlogs[elementsIndex] = newBlog
+      setBlogs(newBlogs)
     }
     catch (error) {
       console.log(error)
       setTimeout(() => {
         setErrorMessage('')
       }, 5000)
-      setErrorMessage('something went wrong when saving the new blog, please enter again')
+      setErrorMessage('something went wrong when updating like for the blog, please enter again')
+    }
+  }
+
+
+  const handleBlogDelete = async (event, id) => {
+    event.preventDefault()
+    const elementsIndex = blogs.findIndex(blog => blog.id === id)
+    const blogToDelete = blogs[elementsIndex]
+    if (window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}`)) {
+      try {
+        await blogService.deleteBlog(blogToDelete)
+        const newBlogs = blogs.filter(blog => blog.id !== id)
+        setBlogs(newBlogs)
+      }
+      catch (error) {
+        setTimeout(() => {
+          setErrorMessage('')
+        }, 5000)
+        setErrorMessage('something went wrong when deleting the blog, please enter again')
+      }
     }
   }
 
@@ -148,9 +131,9 @@ const App = () => {
         <>
           <h2>Login</h2>
           <Togglable buttonLabel='login'>
-            <LoginForm handleSubmit={handleLoginSubmit} handleUsernameChange={handleTextChange}
-              handlePasswordChange={handleTextChange} username={username} password={password} />
+            <LoginForm loginUser={handleLoginSubmit} />
           </Togglable>
+          <p>hint username:tiny  password:tinybird</p>
         </>
       }
       {user !== null &&
@@ -160,12 +143,13 @@ const App = () => {
           <h1>create new</h1>
           {
             <Togglable buttonLabel='new blog' ref={blogFormRef}>
-              <BlogForm handleTitleChange={handleTextChange} handleUrlChange={handleTextChange} handleAuthorChange={handleTextChange}
-                handleSubmit={handleSaveSubmit}></BlogForm>
+              <BlogForm
+                createBlog={handleSaveSubmit}>
+              </BlogForm>
             </Togglable>
           }
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} handleLikes={handleLikesIncrease} />
+            <Blog key={blog.id} blog={blog} handleLikes={handleLikesIncrease} handleDelete={handleBlogDelete} />
           )}
         </div>
       }
