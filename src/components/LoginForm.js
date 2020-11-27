@@ -10,14 +10,14 @@ const LoginForm = ({
 
   const handleTextChange = (event) => {
     switch (event.target.name) {
-    case 'username':
-      setUsername(event.target.value)
-      break
-    case 'password':
-      setPassword(event.target.value)
-      break
-    default:
-      break
+      case 'username':
+        setUsername(event.target.value)
+        break
+      case 'password':
+        setPassword(event.target.value)
+        break
+      default:
+        break
     }
   }
   const login = (event) => {
@@ -35,16 +35,16 @@ const LoginForm = ({
     <div>
       <form onSubmit={login}>
         <div>
-                    username
-          <input value={username} name="username"
+          username
+          <input value={username} name="username" id='username'
             onChange={(event) => handleTextChange(event)} />
         </div>
         <div>
-                    password
-          <input value={password} name="password"
+          password
+          <input value={password} name="password" id="password"
             onChange={(event) => handleTextChange(event)} />
         </div>
-        <button type="submit">login</button>
+        <button type="submit" id="login-button">login</button>
       </form>
     </div>
   )
