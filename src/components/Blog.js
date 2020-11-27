@@ -8,27 +8,27 @@ const Blog = ({ blog, handleLikes, handleDelete }) => {
   const contentVisibility = visibility ? { display: '' } : { display: 'none' }
   const blogContent =
     (
-      <>
+      <div className="blog">
         <ul className="blogContent" style={contentVisibility}>
           <li>{blog.url}</li>
-          <li><span className="likes">likes {blog.likes}</span>
-            <span><button onClick={(event) => handleLikes(event, blog.id)}>like</button></span></li>
+          <li>
+            <span className="likes">likes</span>
+             <span className="likesCount">{blog.likes}</span>
+            <button className="likeButton" onClick={(event) => handleLikes(event, blog.id)}>like</button>
+          </li>
         </ul>
-      </>
+      </div>
     )
 
   return (
     <div className="blog">
       <span>{blog.title}</span> 
       <span>{blog.author}</span>
-      <span>
-        <button onClick={toggleVisibility}>
+        <button className="showButton" onClick={toggleVisibility}>
           {buttonLabel}
         </button>
-        <span>
-          <button onClick={(event) => handleDelete(event, blog.id)}>delete</button>
-        </span>
-      </span>
+          <button className="deleteButton" onClick={(event) => handleDelete(event, blog.id)}>delete
+          </button>
       {blogContent}
     </div>
   )

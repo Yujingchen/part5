@@ -128,7 +128,7 @@ const App = () => {
 
   return (
     <div>
-      {errorMessage && <div className='errorMessage'>
+      {errorMessage && <div className='error errorMessage'>
         {errorMessage}
       </div>}
       {notification && <div className='notification'>
