@@ -7,17 +7,17 @@ const BlogForm = ({ createBlog }) => {
 
   const handleTextChange = (event) => {
     switch (event.target.name) {
-      case 'title':
-        setTitle(event.target.value)
-        break
-      case 'url':
-        setUrl(event.target.value)
-        break
-      case 'author':
-        setAuthor(event.target.value)
-        break
-      default:
-        break
+    case 'title':
+      setTitle(event.target.value)
+      break
+    case 'url':
+      setUrl(event.target.value)
+      break
+    case 'author':
+      setAuthor(event.target.value)
+      break
+    default:
+      break
     }
   }
   const addBlog = (event) => {

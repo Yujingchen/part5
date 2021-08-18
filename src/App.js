@@ -24,9 +24,32 @@ const App = () => {
     blogService.getAll().then(blogs => {
       sortBlogsByLikeCount(blogs)
       setBlogs(blogs)
-    }
-    )
+    })
   }, [])
+
+  const handleLoginSubmit = async (loginData) => {
+    try {
+      const loginUser = await loginService.login(loginData)
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(loginUser)
+      )
+      window.localStorage.setItem('loggedIn', true)
+      setUser(loginUser)
+      blogService.setToken(loginUser.token)
+    }
+    catch (error) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleLogoutSubmit = (event) => {
+    event.preventDefault()
+    setUser(null)
+    window.localStorage.removeItem('loggedBlogappUser')
+  }
 
   const sortBlogsByLikeCount = (blogs) => {
     blogs.sort(function (a, b) {
@@ -56,44 +79,24 @@ const App = () => {
     }
   }
 
-  const handleLoginSubmit = async (loginData) => {
-    try {
-      const loginUser = await loginService.login(loginData)
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(loginUser)
-      )
-      window.localStorage.setItem('loggedIn', true)
-      setUser(loginUser)
-      blogService.setToken(loginUser.token)
-    }
-    catch (error) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
-  const handleLogoutSubmit = (event) => {
-    event.preventDefault()
-    setUser(null)
-    window.localStorage.removeItem('loggedBlogappUser')
-  }
+
 
   const handleLikesIncrease = async (event, id) => {
     event.preventDefault()
     try {
+      console.log('blogs', blogs)
       const elementsIndex = blogs.findIndex(blog => blog.id === id)
       const blogToUpdate = blogs[elementsIndex]
       const newBlog = {
-        id: blogToUpdate.id,
-        user: blogToUpdate.user.ID,
+        user: blogToUpdate.user.id,
         likes: blogToUpdate.likes + 1,
         author: blogToUpdate.author,
         title: blogToUpdate.title,
         url: blogToUpdate.url
       }
+      console.log('newBlog', newBlog)
       const newBlogs = [...blogs]
-      const updatedBlog = await blogService.updateBlog(newBlog)
+      const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
       newBlogs[elementsIndex] = updatedBlog
       setBlogs(newBlogs)
     }
@@ -140,7 +143,6 @@ const App = () => {
           <Togglable buttonLabel='login'>
             <LoginForm loginUser={handleLoginSubmit} />
           </Togglable>
-          <p>hint username:tiny  password:tinybird</p>
         </>
       }
       {user !== null &&

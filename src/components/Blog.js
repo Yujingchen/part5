@@ -8,12 +8,12 @@ const Blog = ({ blog, handleLikes, handleDelete }) => {
   const contentVisibility = visibility ? { display: '' } : { display: 'none' }
   const blogContent =
     (
-      <div className="blog">
-        <ul className="blogContent" style={contentVisibility}>
+      <div className="blogContainer" style={contentVisibility}>
+        <ul className="blogContent" >
           <li>{blog.url}</li>
           <li>
-            <span className="likes">likes</span>
-             <span className="likesCount">{blog.likes}</span>
+            <span className="likes">likes </span>
+            <span className="likesCount">{blog.likes} </span>
             <button className="likeButton" onClick={(event) => handleLikes(event, blog.id)}>like</button>
           </li>
         </ul>
@@ -21,14 +21,14 @@ const Blog = ({ blog, handleLikes, handleDelete }) => {
     )
 
   return (
-    <div className="blog">
-      <span>{blog.title}</span> 
+    <div className="blog" style={{ margin: '15px 0', padding: '0 5px' }}>
+      <span >{blog.title}</span>
       <span>{blog.author}</span>
-        <button className="showButton" onClick={toggleVisibility}>
-          {buttonLabel}
-        </button>
-          <button className="deleteButton" onClick={(event) => handleDelete(event, blog.id)}>delete
-          </button>
+      <button style={{ margin: '5px 10px' } } className="showButton" onClick={toggleVisibility}>
+        {buttonLabel}
+      </button>
+      <button className="deleteButton" onClick={(event) => handleDelete(event, blog.id)}>delete
+      </button>
       {blogContent}
     </div>
   )

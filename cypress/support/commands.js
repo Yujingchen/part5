@@ -26,27 +26,27 @@
 
 
 Cypress.Commands.add('login', ({ username, password }) => {
-    cy.request('POST', 'http://localhost:3003/api/login', {
-        username: username, password: password
-    }).then(response => {
-        localStorage.setItem('loggedBlogappUser', JSON.stringify(response.body))
-        cy.visit('http://localhost:3000')
-    })
-    // cy.contains('login').click()
-    // cy.get('#username').type('angrybird')
-    // cy.get('#password').type('shoot')
-    // cy.get('#login-button').click()
+  cy.request('POST', 'http://localhost:3003/api/login', {
+    username: username, password: password
+  }).then(response => {
+    localStorage.setItem('loggedBlogappUser', JSON.stringify(response.body))
+    cy.visit('http://localhost:3003')
+  })
+  // cy.contains('login').click()
+  // cy.get('#username').type('angrybird')
+  // cy.get('#password').type('shoot')
+  // cy.get('#login-button').click()
 
 })
 Cypress.Commands.add('createBlog', ({ title, author, url,likes }) => {
-    cy.request({
-        url: 'http://localhost:3003/api/blogs',
-        method: 'POST',
-        body: { title, author, url,likes },
-        headers: {
-            'Authorization': `bearer ${JSON.parse(localStorage.getItem('loggedBlogappUser')).token}`
-        }
-    }),
+  cy.request({
+    url: 'http://localhost:3003/api/blogs',
+    method: 'POST',
+    body: { title, author, url,likes },
+    headers: {
+      'Authorization': `bearer ${JSON.parse(localStorage.getItem('loggedBlogappUser')).token}`
+    }
+  }),
 
-        cy.visit('http://localhost:3000')
+  cy.visit('http://localhost:3003')
 })
